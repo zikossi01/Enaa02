@@ -1,164 +1,212 @@
 #include <stdio.h>
+#include <string.h>
 
-#define MAX_PERSONS 100 // Maximum number of persons that can be stored
+#define MAX_PERSONS 100 // Define a constant for the maximum number of persons
 
-// Define the Address structure
-struct Address {
-    char street[100];
+// Structure to hold address information
+typedef struct {
+    char street[50];
     char city[50];
-    int postalCode;
-};
+    int code_postal;
+} Address;
 
-// Define the Person structure
-struct Person {
+// Structure to hold person information
+typedef struct {
     char name[50];
     int age;
-    struct Address address; // Nested Address structure
-};
+    Address address; // Corrected spelling from 'Adress' to 'Address'
+} Person;
 
 // Function prototypes
-void createPerson(struct Person* persons, int* count);
-void displayPersons(struct Person* persons, int count);
-void updatePerson(struct Person* persons, int count);
-void deletePerson(struct Person* persons, int* count);
+void createPerson(Person *p);
+void displayPerson(const Person *p);
+void displayForDeletion(const Person *p);
+void deletePerson(Person persons[], int *count, int index);
+void modifyPerson(Person *p);
+int getValidInput(int min, int max);
 
 int main() {
-    struct Person persons[MAX_PERSONS]; // Array to store Person structures
-    int count = 0; // Number of persons created
-    int choice;
+    Person persons[MAX_PERSONS]; // Array to store created persons
+    int choice; // User choice
+    int personCount = 0; // To track the total number of persons
 
     do {
-        // Display menu
-        printf("\nMenu:\n");
-        printf("1. Create Person\n");
-        printf("2. Display Persons\n");
-        printf("3. Update Person\n");
-        printf("4. Delete Person\n");
-        printf("5. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-        
+        // Display menu options
+        printf("What's next?\n");
+        printf("1. Add a person\n");
+        printf("2. Delete a person\n");
+        printf("3. Modify a person\n");
+        printf("4. Display persons\n");
+        printf("0. Exit\n");
+        choice = getValidInput(0, 4); // Get valid user choice
+
         switch (choice) {
-            case 1:
-                createPerson(persons, &count); // Create a new Person
+            case 1: { // Adding a new person
+                int numToAdd = 0;
+
+                printf("How many persons would you like to add? (Max: %d)\n", MAX_PERSONS - personCount);
+                numToAdd = getValidInput(1, MAX_PERSONS - personCount); // Get valid number of persons to add
+
+                for (int i = 0; i < numToAdd; i++) {
+                    printf("Person %d\n", personCount + 1);
+                    createPerson(&persons[personCount]);
+                    personCount++;
+                }
                 break;
-            case 2:
-                displayPersons(persons, count); // Display all Persons
+            }
+
+            case 2: { // Deleting a person
+                if (personCount == 0) {
+                    printf("No persons to delete.\n");
+                    break;
+                }
+                printf("Which person number do you want to delete?\n");
+                for (int i = 0; i < personCount; i++) {
+                    displayForDeletion(&persons[i]);
+                }
+                int index = getValidInput(1, personCount);
+                deletePerson(persons, &personCount, index);
                 break;
-            case 3:
-                updatePerson(persons, count); // Update a Person's information
+            }
+
+            case 3: { // Modifying a person
+                if (personCount == 0) {
+                    printf("No persons to modify.\n");
+                    break;
+                }
+                printf("Which person number do you want to modify?\n");
+                for (int i = 0; i < personCount; i++) {
+                    displayForDeletion(&persons[i]);
+                }
+                int index = getValidInput(1, personCount);
+                modifyPerson(&persons[index - 1]);
                 break;
-            case 4:
-                deletePerson(persons, &count); // Delete a Person
+            }
+
+            case 4: { // Displaying persons
+                if (personCount == 0) {
+                    printf("No persons to display.\n");
+                    break;
+                }
+                for (int i = 0; i < personCount; i++) {
+                    displayPerson(&persons[i]);
+                }
                 break;
-            case 5:
-                printf("Exiting the program.\n");
+            }
+
+            case 0: // Exit
+                printf("Exiting...\n");
                 break;
+
             default:
                 printf("Invalid choice. Please try again.\n");
+                break;
         }
-    } while (choice != 5);
+        printf("-----------------------------\n");
+    } while (choice != 0);
 
     return 0;
 }
 
-// Function to create a new Person
-void createPerson(struct Person* persons, int* count) {
-    if (*count >= MAX_PERSONS) {
-        printf("Cannot create more Persons. Limit reached.\n");
-        return;
-    }
-    
-    struct Person newPerson;
+// Function to create a new person
+void createPerson(Person *p) {
+    printf("Name: ");
+    scanf("%49s", p->name);
 
-    // Get user input for the new Person
-    printf("Enter name: ");
-    scanf("%s", newPerson.name); // Basic input without spaces
-    printf("Enter age: ");
-    scanf("%d", &newPerson.age);
-    printf("Enter street: ");
-    scanf("%s", newPerson.address.street); // Basic input without spaces
-    printf("Enter city: ");
-    scanf("%s", newPerson.address.city); // Basic input without spaces
-    printf("Enter postal code: ");
-    scanf("%d", &newPerson.address.postalCode);
+    printf("Age: ");
+    scanf("%d", &p->age);
 
-    // Add the new Person to the array
-    persons[*count] = newPerson;
-    (*count)++; // Increment the count of Persons
-    printf("Person created successfully.\n");
+    printf("Address (Street): ");
+    scanf("%49s", p->address.street);
+
+    printf("Address (City): ");
+    scanf("%49s", p->address.city);
+
+    printf("Address (Code Postal): ");
+    scanf("%d", &p->address.code_postal);
+
+    printf("-------------------------\n");
 }
 
-// Function to display all Persons
-void displayPersons(struct Person* persons, int count) {
-    if (count == 0) {
-        printf("No Persons available.\n");
-        return;
-    }
-
-    printf("\nList of Persons:\n");
-    for (int i = 0; i < count; i++) {
-        printf("Person %d:\n", i + 1);
-        printf("Name: %s\n", persons[i].name);
-        printf("Age: %d\n", persons[i].age);
-        printf("Address: %s, %s, %d\n", persons[i].address.street, persons[i].address.city, persons[i].address.postalCode);
-    }
+// Function to display a person
+void displayPerson(const Person *p) {
+    printf("Name: %s\n", p->name);
+    printf("Age: %d\n", p->age);
+    printf("Address (Street): %s\n", p->address.street);
+    printf("Address (City): %s\n", p->address.city);
+    printf("Address (Code Postal): %d\n", p->address.code_postal);
+    printf("--------------------------\n");
 }
 
-// Function to update a Person's information
-void updatePerson(struct Person* persons, int count) {
-    if (count == 0) {
-        printf("No Persons available to update.\n");
-        return;
-    }
-
-    int index;
-    printf("Enter the person number to update (1 to %d): ", count);
-    scanf("%d", &index);
-    
-    if (index < 1 || index > count) {
-        printf("Invalid person number.\n");
-        return;
-    }
-
-    struct Person* person = &persons[index - 1];
-
-    // Get new information for the Person
-    printf("Enter new name (current: %s): ", person->name);
-    scanf("%s", person->name); // Basic input without spaces
-    printf("Enter new age (current: %d): ", person->age);
-    scanf("%d", &person->age);
-    printf("Enter new street (current: %s): ", person->address.street);
-    scanf("%s", person->address.street); // Basic input without spaces
-    printf("Enter new city (current: %s): ", person->address.city);
-    scanf("%s", person->address.city); // Basic input without spaces
-    printf("Enter new postal code (current: %d): ", person->address.postalCode);
-    scanf("%d", &person->address.postalCode);
-
-    printf("Person updated successfully.\n");
+// Function to display a person's name for deletion
+void displayForDeletion(const Person *p) {
+    printf("Name: %s\n", p->name);
+    printf("--------------------------\n");
 }
 
-// Function to delete a Person
-void deletePerson(struct Person* persons, int* count) {
-    if (*count == 0) {
-        printf("No Persons available to delete.\n");
-        return;
-    }
-
-    int index;
-    printf("Enter the person number to delete (1 to %d): ", *count);
-    scanf("%d", &index);
-    
+// Function to delete a person
+void deletePerson(Person persons[], int *count, int index) {
     if (index < 1 || index > *count) {
-        printf("Invalid person number.\n");
+        printf("Invalid person number\n");
         return;
     }
 
-    // Shift remaining Persons to fill the gap
     for (int i = index - 1; i < *count - 1; i++) {
         persons[i] = persons[i + 1];
     }
+    (*count)--;
 
-    (*count)--; // Decrease the count
-    printf("Person deleted successfully.\n");
+    printf("Person number %d deleted successfully.\n", index);
+    printf("--------------------------\n");
+}
+
+// Function to modify a person's details
+void modifyPerson(Person *p) {
+    int choice;
+    printf("What would you like to modify?\n");
+    printf("1. Name\n");
+    printf("2. Age\n");
+    printf("3. Address (Street)\n");
+    printf("4. Address (City)\n");
+    printf("5. Address (Code Postal)\n");
+    printf("Choose an option (1-5): ");
+    choice = getValidInput(1, 5);
+
+    switch (choice) {
+        case 1:
+            printf("Enter new name: ");
+            scanf("%49s", p->name);
+            break;
+        case 2:
+            printf("Enter new age: ");
+            scanf("%d", &p->age);
+            break;
+        case 3:
+            printf("Enter new Address (Street): ");
+            scanf("%49s", p->address.street);
+            break;
+        case 4:
+            printf("Enter new Address (City): ");
+            scanf("%49s", p->address.city);
+            break;
+        case 5:
+            printf("Enter new Address (Code Postal): ");
+            scanf("%d", &p->address.code_postal);
+            break;
+        default:
+            printf("Invalid choice\n");
+            break;
+    }
+}
+
+// Function to get valid user input within a specified range
+int getValidInput(int min, int max) {
+    int input;
+    while (1) {
+        scanf("%d", &input);
+        if (input >= min && input <= max) {
+            return input;
+        }
+        printf("Invalid input. Please enter a number between %d and %d: ", min, max);
+    }
 }
