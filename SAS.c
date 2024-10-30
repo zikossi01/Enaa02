@@ -41,6 +41,7 @@ void displayTasks(Task tasks[], int task_count) {
         }
     }
 }
+
 int modifyTask(Task tasks[], int task_count) {
     int index;
     printf("Enter the task number to modify: ");
@@ -62,6 +63,51 @@ int modifyTask(Task tasks[], int task_count) {
     return task_count;
 }
 
+int deleteTask(Task tasks[], int task_count) {
+    int index;
+    printf("Enter the task number to delete: ");
+    scanf("%d", &index);
+    if (index > 0 && index <= task_count) {
+        index--;
+        int i = index;
+        while (i < task_count - 1) {
+            tasks[i] = tasks[i + 1];
+            i++;
+        }
+        task_count--;
+        printf("Task deleted successfully!\n");
+    } else {
+        printf("Invalid task number.\n");
+    }
+    return task_count;
+}
+
+void filterTasksByPriority(Task tasks[], int task_count) {
+    if (task_count == 0) {
+        printf("No tasks available.\n");
+        return;
+    }
+    int filter_priority, found = 0;
+    printf("Enter priority to filter by (1 for High, 0 for Low): ");
+    scanf("%d", &filter_priority);
+    
+    int i = 0;
+    while (i < task_count) {
+        if (tasks[i].priority == filter_priority) {
+            printf("Task %d:\n", i + 1);
+            printf("Title: %s\n", tasks[i].title);
+            printf("Description: %s\n", tasks[i].description);
+            printf("Due Date: %s\n", tasks[i].due_date);
+            printf("--------------------------\n");
+            found = 1;
+        }
+        i++;
+    }
+    if (found == 0) {
+        printf("No tasks found\n");
+    }
+}
+
 int main() {
     Task tasks[10];
     int task_count = 0, choice = -1;
@@ -80,6 +126,10 @@ int main() {
         } else if (choice == 3) {
             task_count = modifyTask(tasks, task_count);
         } else if (choice == 4) {
+            task_count = deleteTask(tasks, task_count);
+        } else if (choice == 5) {
+            filterTasksByPriority(tasks, task_count);
+        } else if (choice == 0) {
             printf("Exiting...\n");
         } else {
             printf("Invalid choice. Please try again.\n");
@@ -87,7 +137,4 @@ int main() {
     }
     return 0;
 }
-
-
-
 
