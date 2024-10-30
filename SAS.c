@@ -41,5 +41,53 @@ void displayTasks(Task tasks[], int task_count) {
         }
     }
 }
+int modifyTask(Task tasks[], int task_count) {
+    int index;
+    printf("Enter the task number to modify: ");
+    scanf("%d", &index);
+    if (index > 0 && index <= task_count) {
+        index--;
+        printf("Enter new title: ");
+        scanf(" %[^\n]", tasks[index].title);
+        printf("Enter new description: ");
+        scanf(" %[^\n]", tasks[index].description);
+        printf("Enter new due date (YYYY-MM-DD): ");
+        scanf(" %[^\n]", tasks[index].due_date);
+        printf("Enter new priority (1 for High, 0 for Low): ");
+        scanf("%d", &tasks[index].priority);
+        printf("Task modified successfully!\n");
+    } else {
+        printf("Invalid task number.\n");
+    }
+    return task_count;
+}
+
+int main() {
+    Task tasks[10];
+    int task_count = 0, choice = -1;
+
+    while (choice != 0) {
+        printf("Task Management Application\n");
+        printf("1. Add Task\n2. Display Tasks\n3. Modify Task\n4. Delete Task\n5. Filter Tasks by Priority\n0. Exit\n");
+        printf("Choose an option: ");
+        scanf("%d", &choice);
+        printf("-----------------------------\n");
+
+        if (choice == 1) {
+            task_count = addTask(tasks, task_count);
+        } else if (choice == 2) {
+            displayTasks(tasks, task_count);
+        } else if (choice == 3) {
+            task_count = modifyTask(tasks, task_count);
+        } else if (choice == 4) {
+            printf("Exiting...\n");
+        } else {
+            printf("Invalid choice. Please try again.\n");
+        }
+    }
+    return 0;
+}
+
+
 
 
