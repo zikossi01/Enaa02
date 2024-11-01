@@ -8,6 +8,7 @@ typedef struct {
 } Task;
 
 // Function to input and validate date
+// Function to input and validate date
 int inputDate(char date[11]) {
     int year, month, day;
     char date_input[20];
@@ -21,38 +22,38 @@ int inputDate(char date[11]) {
             printf("Invalid date format. Please use YYYY-MM-DD.\n");
             continue; // Prompt the user to try again
         }
-        
-        // Check year, month, and day ranges
+
+        // Simple date validation
         if (year < 2024) {
             printf("Year must be 2024 or later. Please try again.\n");
-            continue; // Prompt the user to try again
+            continue;
         }
         if (month < 1 || month > 12) {
             printf("Month must be between 1 and 12. Please try again.\n");
-            continue; // Prompt the user to try again
+            continue;
         }
         if (day < 1 || day > 31) {
             printf("Day must be between 1 and 31. Please try again.\n");
-            continue; // Prompt the user to try again
-        }
-
-        // Check for days in each month (simplified, does not account for leap years)
-        if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
-            printf("Invalid day for the month (30 days). Please try again.\n");
-            continue; // Prompt the user to try again
-        }
-        if (month == 2 && day > 29) {
-            printf("Invalid day for February (up to 29 days). Please try again.\n");
-            continue; // Prompt the user to try again
-        }
-        if (month == 2 && day == 29 && (year % 4 != 0 || (year % 100 == 0 && year % 400 != 0))) {
-            printf("Invalid day for February in a non-leap year. Please try again.\n");
-            continue; // Prompt the user to try again
+            continue;
         }
 
         // If validation is successful, copy the date into the provided variable
         snprintf(date, 11, "%s", date_input);
         return 1; // Indicate success
+    }
+}
+
+// Function to input and validate task priority
+int inputPriority() {
+    int priority;
+    while (1) {
+        printf("Enter task priority (1 for High, 0 for Low): ");
+        scanf("%d", &priority);
+        if (priority == 0 || priority == 1) {
+            return priority; // Valid priority
+        } else {
+            printf("Invalid priority. Please enter 0 for Low or 1 for High.\n");
+        }
     }
 }
 
@@ -68,8 +69,8 @@ int addTask(Task tasks[], int task_count) {
             return task_count; // Return without adding the task
         }
 
-        printf("Enter task priority (1 for High, 0 for Low): ");
-        scanf("%d", &tasks[task_count].priority);
+        // Call inputPriority function for priority input
+        tasks[task_count].priority = inputPriority();
         task_count++;
         printf("Task added successfully!\n");
     } else {
@@ -109,8 +110,8 @@ int modifyTask(Task tasks[], int task_count) {
             return task_count; // Return without modifying the task
         }
 
-        printf("Enter new priority (1 for High, 0 for Low): ");
-        scanf("%d", &tasks[index].priority);
+        // Call inputPriority function for priority input
+        tasks[index].priority = inputPriority();
         printf("Task modified successfully!\n");
     } else {
         printf("Invalid task number.\n");
