@@ -9,19 +9,13 @@ typedef struct {
 
 // Function to input and validate date
 // Function to input and validate date
+// Function to input and validate date
 int inputDate(char date[11]) {
     int year, month, day;
-    char date_input[20];
 
     while (1) { // Loop until a valid date is entered
         printf("Enter due date (YYYY-MM-DD): ");
-        scanf(" %[^\n]", date_input);
-        
-        // Validate the date format
-        if (sscanf(date_input, "%d-%d-%d", &year, &month, &day) != 3) {
-            printf("Invalid date format. Please use YYYY-MM-DD.\n");
-            continue; // Prompt the user to try again
-        }
+        scanf("%4d-%2d-%2d", &year, &month, &day);
 
         // Simple date validation
         if (year < 2024) {
@@ -37,12 +31,11 @@ int inputDate(char date[11]) {
             continue;
         }
 
-        // If validation is successful, copy the date into the provided variable
-        snprintf(date, 11, "%s", date_input);
+        // If validation is successful, format the date as a string
+        sprintf(date, "%04d-%02d-%02d", year, month, day);
         return 1; // Indicate success
     }
 }
-
 // Function to input and validate task priority
 int inputPriority() {
     int priority;
