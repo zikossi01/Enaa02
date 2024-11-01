@@ -8,34 +8,54 @@ typedef struct {
 } Task;
 
 // Function to input and validate date
-// Function to input and validate date
-// Function to input and validate date
 int inputDate(char date[11]) {
     int year, month, day;
+    char date_input[20];
 
     while (1) { // Loop until a valid date is entered
         printf("Enter due date (YYYY-MM-DD): ");
-        scanf("%4d-%2d-%2d", &year, &month, &day);
-
-        // Simple date validation
+        scanf(" %[^\n]", date_input);
+        
+        // Validate the date format
+        if (sscanf(date_input, "%d-%d-%d", &year, &month, &day) != 3) {
+            printf("Invalid date format. Please use YYYY-MM-DD.\n");
+            continue; // Prompt the user to try again
+        }
+        
+        // Check year, month, and day ranges
         if (year < 2024) {
             printf("Year must be 2024 or later. Please try again.\n");
-            continue;
+            continue; // Prompt the user to try again
         }
         if (month < 1 || month > 12) {
             printf("Month must be between 1 and 12. Please try again.\n");
-            continue;
+            continue; // Prompt the user to try again
         }
         if (day < 1 || day > 31) {
             printf("Day must be between 1 and 31. Please try again.\n");
-            continue;
+            continue; // Prompt the user to try again
         }
 
-        // If validation is successful, format the date as a string
-        sprintf(date, "%04d-%02d-%02d", year, month, day);
+        // Check for days in each month (simplified, does not account for leap years)
+        if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            printf("Invalid day for the month (30 days). Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+        if (month == 2 && day > 29) {
+            printf("Invalid day for February (up to 29 days). Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+        if (month == 2 && day == 29 && (year % 4 != 0 || (year % 100 == 0 && year % 400 != 0))) {
+            printf("Invalid day for February in a non-leap year. Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+
+        // If validation is successful, copy the date into the provided variable
+        snprintf(date, 11, "%s", date_input);
         return 1; // Indicate success
     }
 }
+
 // Function to input and validate task priority
 int inputPriority() {
     int priority;
@@ -181,4 +201,4 @@ int main() {
         }
     }
     return 0;
-}
+} 
