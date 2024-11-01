@@ -7,14 +7,67 @@ typedef struct {
     int priority; // Priority of the task (0 for Low, 1 for High)
 } Task;
 
+// Function to input and validate date
+int inputDate(char date[11]) {
+    int year, month, day;
+    char date_input[20];
+
+    while (1) { // Loop until a valid date is entered
+        printf("Enter due date (YYYY-MM-DD): ");
+        scanf(" %[^\n]", date_input);
+        
+        // Validate the date format
+        if (sscanf(date_input, "%d-%d-%d", &year, &month, &day) != 3) {
+            printf("Invalid date format. Please use YYYY-MM-DD.\n");
+            continue; // Prompt the user to try again
+        }
+        
+        // Check year, month, and day ranges
+        if (year < 2024) {
+            printf("Year must be 2024 or later. Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+        if (month < 1 || month > 12) {
+            printf("Month must be between 1 and 12. Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+        if (day < 1 || day > 31) {
+            printf("Day must be between 1 and 31. Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+
+        // Check for days in each month (simplified, does not account for leap years)
+        if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            printf("Invalid day for the month (30 days). Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+        if (month == 2 && day > 29) {
+            printf("Invalid day for February (up to 29 days). Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+        if (month == 2 && day == 29 && (year % 4 != 0 || (year % 100 == 0 && year % 400 != 0))) {
+            printf("Invalid day for February in a non-leap year. Please try again.\n");
+            continue; // Prompt the user to try again
+        }
+
+        // If validation is successful, copy the date into the provided variable
+        snprintf(date, 11, "%s", date_input);
+        return 1; // Indicate success
+    }
+}
+
 int addTask(Task tasks[], int task_count) {
     if (task_count < 10) {
         printf("Enter task title: ");
         scanf(" %[^\n]", tasks[task_count].title);
         printf("Enter task description: ");
         scanf(" %[^\n]", tasks[task_count].description);
-        printf("Enter due date (YYYY-MM-DD): ");
-        scanf(" %[^\n]", tasks[task_count].due_date);
+        
+        // Call the inputDate function to get the due date
+        if (!inputDate(tasks[task_count].due_date)) {
+            return task_count; // Return without adding the task
+        }
+
         printf("Enter task priority (1 for High, 0 for Low): ");
         scanf("%d", &tasks[task_count].priority);
         task_count++;
@@ -29,15 +82,13 @@ void displayTasks(Task tasks[], int task_count) {
     if (task_count == 0) {
         printf("No tasks available.\n");
     } else {
-        int i = 0;
-        while (i < task_count) {
+        for (int i = 0; i < task_count; i++) {
             printf("Task %d:\n", i + 1);
             printf("Title: %s\n", tasks[i].title);
             printf("Description: %s\n", tasks[i].description);
             printf("Due Date: %s\n", tasks[i].due_date);
             printf("Priority: %s\n", tasks[i].priority ? "High" : "Low");
             printf("--------------------------\n");
-            i++;
         }
     }
 }
@@ -52,8 +103,12 @@ int modifyTask(Task tasks[], int task_count) {
         scanf(" %[^\n]", tasks[index].title);
         printf("Enter new description: ");
         scanf(" %[^\n]", tasks[index].description);
-        printf("Enter new due date (YYYY-MM-DD): ");
-        scanf(" %[^\n]", tasks[index].due_date);
+        
+        // Call the inputDate function to modify the due date
+        if (!inputDate(tasks[index].due_date)) {
+            return task_count; // Return without modifying the task
+        }
+
         printf("Enter new priority (1 for High, 0 for Low): ");
         scanf("%d", &tasks[index].priority);
         printf("Task modified successfully!\n");
@@ -69,10 +124,8 @@ int deleteTask(Task tasks[], int task_count) {
     scanf("%d", &index);
     if (index > 0 && index <= task_count) {
         index--;
-        int i = index;
-        while (i < task_count - 1) {
+        for (int i = index; i < task_count - 1; i++) {
             tasks[i] = tasks[i + 1];
-            i++;
         }
         task_count--;
         printf("Task deleted successfully!\n");
@@ -91,8 +144,7 @@ void filterTasksByPriority(Task tasks[], int task_count) {
     printf("Enter priority to filter by (1 for High, 0 for Low): ");
     scanf("%d", &filter_priority);
     
-    int i = 0;
-    while (i < task_count) {
+    for (int i = 0; i < task_count; i++) {
         if (tasks[i].priority == filter_priority) {
             printf("Task %d:\n", i + 1);
             printf("Title: %s\n", tasks[i].title);
@@ -101,10 +153,9 @@ void filterTasksByPriority(Task tasks[], int task_count) {
             printf("--------------------------\n");
             found = 1;
         }
-        i++;
     }
-    if (found == 0) {
-        printf("No tasks found\n");
+    if (!found) {
+        printf("No tasks found with the specified priority.\n");
     }
 }
 
@@ -137,4 +188,3 @@ int main() {
     }
     return 0;
 }
-
